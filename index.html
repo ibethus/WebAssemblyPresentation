@@ -1,40 +1,218 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css">
+	<title>Discover WebAssembly</title>
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+	<link rel="icon" type="image/png" href="assets/wasm-logo.png" />
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<p>Qu'est-ce que le</p>
+				<h1>WebAssembly</h1>
+			</section>
+			<!-- *************** PRINCIPE ***************** -->
+			<section data-transition="fade">
+				<h3>1. Principe</h3>
+				<section>
+					<p>Le WebAssembly (wasm) est un bytecode executé dans une machine virtuelle, interpretable par des
+						navigateurs web. Il permet d'exécuter un code performant, sécurisé et très bas niveau par
+						rapport
+						aux languages web habituels.</p>
+				</section>
+				<section data-auto-animate>
+					<h4>1.1 Performances</h4>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<ul>
+						<li> Le WebAssembly est un langage machine qui peut être executé directement depuis le
+							navigateur
+						</li>
+						<li> Bien que le JavaScript soit désormais également compilé par les navigateurs pour de
+							meilleurs performances, le WebAssembly possède un avantage indéniable : <a
+								href="https://react-etc.net/entry/webassembly-vs-javascript-streaming-compilation-performance-advantage"
+								target="_blank">la
+								Streaming
+								compilation</a>
+						</li>
+					</ul>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<h4>JavaScript</h4>
+					<img src="./assets/javascript.png" alt="logo">
+					<p>En JavaScript, chaque fichier contenant le code doit être <span>totalement téléchargé</span> par
+						le
+						client avant que celui-ci puisse commencer à le compiler en code natif.</p>
+				</section>
+				<section data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<h4>JavaScript</h4>
+					<img src="./assets/javascript.png" alt="logo">
+					<p>En JavaScript, chaque fichier contenant le code doit être <span style="color: red;">totalement
+							téléchargé</span> par le
+						client avant que celui-ci puisse commencer à le compiler en code natif.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<h4>WASM</h4>
+					<img src="./assets/wasm.png" alt="logo">
+					<p>En WebAssembly, le code est <span>streamé vers l'utilisateur</span> et la compilation en code
+						natif
+						démarre dès les premiers bits reçus.</p>
+				</section>
+				<section data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<h4>WASM</h4>
+					<img src="./assets/wasm.png" alt="logo">
+					<p>En WebAssembly, le code est <span style="color: red;">streamé vers l'utilisateur</span> et la
+						compilation en code natif
+						démarre dès les premiers bits reçus.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<p>Cette différence de fonctionnement entre les deux langages donne un avantage certain
+						au wasm en terme de temps de démarrage, notamment lorsque la connexion est moins
+						bonne (sur les appareils mobiles par exemple).</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<p>Le WebAssembly compilé donne également de meilleurs résultats que le JavaScript
+						compilé, notamment sur mobile : <a
+							href="https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193?p=783c454449cd"
+							target="_blank">Voir
+							ce
+							benchmark</a>
+					</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.1 Performances</h4>
+					<p>Le WebAssembly compilé donne également de meilleurs résultats que le JavaScript
+						compilé, notamment sur mobile : <a
+							href="https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193?p=783c454449cd"
+							target="_blank">Voir
+							ce
+							benchmark</a>
+					</p>
+					<p> Le gain en vitesse de chargement est de l'ordre de 30% <ins>minimum</ins>.
+					</p>
+				</section>
+				<section data-auto-animate>
+					<h4>1.2 Sécurité</h4>
+				</section>
+				<section data-transition="fade" data-auto-animate>
+					<h4 class="subtitle">1.2 Sécurité</h4>
+					<p data-id="main_text">Le WebAssembly est executé dans un environnement dit <a
+							href="https://webassembly.org/docs/security/" target="_blank">sandbox</a>
+						, tout comme le JavaScript, il possède donc les mêmes caractéristiques en terme de sécurité.
+					<p>
+
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.2 Sécurité</h4>
+					<p data-id="main_text">Le WebAssembly est executé dans un environnement dit <a
+							href="https://webassembly.org/docs/security/" target="_blank">sandbox</a>
+						, tout comme le JavaScript, il possède donc les mêmes caractéristiques en terme de sécurité.
+					<p>
+					<p>On ne peut utiliser que des APIs fournies par le navigateur (à l'inverse d'un langage
+						comme Java qui peut faire des appels système via Java.io par exemple)</p>
+				</section>
+				<section data-transition="fade">
+					<h4 class="subtitle">1.2 Sécurité</h4>
+					<p>Enfin, les failles de type <a
+							href="https://owasp.org/www-community/attacks/Buffer_overflow_attack" target="_blank">stack
+							overflow</a> sont rendues inexploitable de par la
+						conception même du WebAssembly : <span class="red">il n'existe pas de principe de mémoire
+							exécutable.</span>
+					</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4>1.3 Bas-niveau</h4>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.3 Bas-niveau</h4>
+					<p>Le WebAssembly étant compilé dans un bytecode proche du langage machine, cela permet de réaliser
+						des <span class="red">optimisations très fines en terme d'allocation mémoire.</span></p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">1.3 Bas-niveau</h4>
+					<p>Cependant, ce bytecode est à destination d'une <span class="red"> machine virtuelle</span>, ce
+						qui permet de s'affranchir de l'architecture du processeur utilisé par le client pour exécuter
+						le code. </p>
+				</section>
+			</section>
+			<!-- *************** FONCTIONNEMENT ***************** -->
+			<section>
+				<h2>2. Fonctionnement</h2>
+			</section>
+			<section data-auto-animate data-transition="fade">
+				
+			</section>
+			</section>
+			<section>
+				<!-- *************** DEMOS ***************** -->
+				<section>
+					<h2>3. Démos</h2>
+				</section>
+				<section style="width: 100%; height: 100%;">
+					<iframe id="3DSimCar" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
+						allow="autoplay"
+						data-src="https://rawcdn.githack.com/kripken/ammo.js/99d0ec0b1e26d7ccc13e013caba8e8a5c98d953b/examples/webgl_demo_vehicle/index.html"
+						style="width: 100%; height: 100%; max-height: 100%; max-width: 100%;"
+						src="https://rawcdn.githack.com/kripken/ammo.js/99d0ec0b1e26d7ccc13e013caba8e8a5c98d953b/examples/webgl_demo_vehicle/index.html"></iframe>
+				</section>
+			</section>
+			<section>
+				<!-- *************** PLUS LOIN ***************** -->
+				<section>
+					<h2>4. Aller plus loin</h2>
+				</section>
+				<section>
+					<h2>hello world</h2>
+				</section>
+			</section>
+			<section>
+				<!-- *************** SOURCES ***************** -->
+				<section>
+					<h2>5. Sources</h2>
+				</section>
+				<section>
+					<h2>hello world</h2>
+				</section>
+			</section>
 		</div>
+	</div>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+		// var iframe = document.getElementById("3DSimCar");
+		//iframe.contentWindow.focus();
+	</script>
+</body>
+
 </html>
