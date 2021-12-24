@@ -284,6 +284,8 @@ gulp.task('package', gulp.series('default', () =>
 gulp.task('reload', () => gulp.src(['*.html', '*.md'])
     .pipe(connect.reload()));
 
+
+
 gulp.task('serve', () => {
 
     connect.server({
@@ -311,4 +313,14 @@ gulp.task('serve', () => {
 
     gulp.watch(['test/*.html'], gulp.series('test'))
 
+})
+
+gulp.task('prod', () => {
+
+    connect.server({
+        root: root,
+        port: port,
+        host: '0.0.0.0',
+        livereload: false
+    })
 })
