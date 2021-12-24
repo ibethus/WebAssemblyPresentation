@@ -1,6 +1,6 @@
 {
   "name": "webassembly-presentation",
-  "version": "1.0",
+  "version": "1.0.0",
   "main": "dist/reveal.js",
   "module": "dist/reveal.esm.js",
   "license": "MIT",
