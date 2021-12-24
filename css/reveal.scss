@@ -9,6 +9,27 @@
 @import 'layout';
 
 /*********************************************
+* CUSTOM
+*********************************************/
+img[alt=logo] {
+	 width: 100px; 
+	}
+
+.red {
+	color: #be0303;
+}
+
+.subtitle{
+	position: fixed;
+	margin: 5% auto;
+	left: 0;
+	right: 0;
+	top: 10%;
+
+	font-size: 1.5rem !important;
+}
+
+/*********************************************
  * GLOBAL STYLES
  *********************************************/
 
