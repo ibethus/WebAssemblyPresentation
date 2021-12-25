@@ -127,8 +127,8 @@
 							href="https://webassembly.org/docs/security/" target="_blank">sandbox</a>
 						, tout comme le JavaScript, il possède donc les mêmes caractéristiques en terme de sécurité.
 					<p>
-					<p>On ne peut utiliser que des APIs fournies par le navigateur (à l'inverse d'un langage
-						comme Java qui peut faire des appels système via Java.io par exemple)</p>
+					<p>On ne peut utiliser que des APIs fournies par la machine virtuelle (à l'inverse d'un langage
+						comme Java qui peut faire des appels système via Java.io via la jvm par exemple)</p>
 				</section>
 				<section data-transition="fade">
 					<h4 class="subtitle">1.2 Sécurité</h4>
@@ -157,23 +157,359 @@
 			<!-- *************** FONCTIONNEMENT ***************** -->
 			<section>
 				<h2>2. Fonctionnement</h2>
-			</section>
-			<section data-auto-animate data-transition="fade">
-				
+				<section data-auto-animate data-transition="fade">
+					<p>
+						Le WebAssembly étant un langage machine, il faut écrire son programme dans un langage de base
+						puis le compiler en wasm.
+						Pour cet exemple, nous nous appuyerons sur un code en C/C++ (basé sur <a target="_blank"
+							href="https://blog.esciencecenter.nl/using-c-in-a-web-app-with-webassembly-efd78c08469">cet
+							article</a>).
+					</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4>2.1 Le code C++</h4>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<p>Le but de ce programme simple est de calculer la racine d'une fonction selon la <a
+							target="_blank" href="https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Newton">méthode de
+							newton.</a> (ou Newton-Raphson)</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<p>Le but de ce programme simple est de calculer la racine d'une fonction selon la <a
+							target="_blank" href="https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Newton">méthode de
+							newton.</a> (ou Newton-Raphson)</p>
+					<p>Nous avons besoin pour cela de prendre en paramètre une fonction ainsi que sa dérivée.</p>
+				</section>
+				<section data-transition="fade">
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<pre><code data-line-numbers>// Exemple d'equation
+float equation(float x) {
+  return 2 * x * x * x - 4 * x * x + 6;
+}
+
+// Dérivée de l'équation ci-dessus
+float derivative(float x) {
+  return 6 * x * x - 8 * x;
+}
+					</code></pre>
+					<p class="legende">problem.cpp</p>
+					<p class="small-text">Voici le code de l'équation dont la racine est recherchée, ainsi que sa
+						dérivée
+						(les header files sont exclus).
+					</p>
+				</section>
+				<section data-transition="fade" data-auto-animate>
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<pre>
+						<code data-line-numbers="2">
+NewtonRaphson::NewtonRaphson(float tolerance_in) : tolerance(tolerance_in) {}
+
+float NewtonRaphson::solve(float initial_guess) {
+	float x = initial_guess;
+	float delta_x = 0;
+	do {
+		delta_x = equation(x) / derivative(x);
+		x = x - delta_x;
+	} while (std::abs(delta_x) >= tolerance);
+	return x;
+};
+						</code>
+					</pre>
+					<p class="legende">newtonraphson.cpp</p>
+					<p class="small-text">La classe est initialisée avec une valeur de tolérance.</p>
+				</section>
+				<section data-transition="fade" data-auto-animate>
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<pre>
+						<code data-line-numbers="4-12">
+NewtonRaphson::NewtonRaphson(float tolerance_in) : tolerance(tolerance_in) {}
+
+float NewtonRaphson::solve(float initial_guess) {
+	float x = initial_guess;
+	float delta_x = 0;
+	do {
+		delta_x = equation(x) / derivative(x);
+		x = x - delta_x;
+	} while (std::abs(delta_x) >= tolerance);
+	return x;
+};
+						</code>
+					</pre>
+					<p class="legende">newtonraphson.cpp</p>
+					<p class="small-text">Ensuite, la méthode solve de la classe peut être appelée pour trouver
+						récursivement la racine de l'équation.</p>
+				</section>
+				<section data-transition="fade" data-auto-animate>
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<pre>
+						<code data-line-numbers>int main(){
+	float initial_guess = -4;
+	float tolerance = 0.001;
+	NewtonRaphson newtonraphson(tolerance);
+	float root = newtonraphson.solve(initial_guess);
+
+	std::cout << root << std::endl;
+}
+						</code>
+					</pre>
+					<p class="small-text">Un code comme celui-ci nous permet d'obtenir root = -1, ce
+						qui correspond bien à la valeur de la racine de l'équation définie plus tôt.
+					</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.1 Le code C++</h4>
+					<pre>
+						<code data-line-numbers data-trim>
+							<script type="text/template">
+using namespace emscripten;
+
+EMSCRIPTEN_BINDINGS(newtonraphson) {
+	class_<NewtonRaphson>("NewtonRaphson")
+		.constructor<float>()
+		.function("solve", &NewtonRaphson::solve)
+		;
+}
+							</script>
+						</code>
+					</pre>
+					<p class="legende">bindings.cpp</p>
+					<p class="small-text">Enfin, il convient de définir un fichier dit de "binding" qui permetra
+						d'effectuer des appels au
+						code c++ depuis le javascript.
+						Ce code est écrit en utilisant <a target="_blank"
+							href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#classes">les
+							méthodes de binding de emscripten</a>, qui est l'outil qui servira plus tard à compiler le
+						code
+						en wasm.
+					</p>
+				</section>
+				<section data-transition="fade" data-auto-animate>
+					<h4>2.2 Compiler en wasm</h4>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<p>Il s'agit de l'étape la plus importante et la délicate à réaliser : </p>
+					<ul>
+						<li class="fragment fade-in">Pour du C/C++ l'outil utilisé est <a target="_blank"
+								href="https://emscripten.org/">emscripten</a></li>
+						<li class="fragment fade-in">Il faut compiler le code en module wasm utilisable directement
+							depuis un code en JavaScript</li>
+					</ul>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<p>La façon la plus simple et stable d'utiliser emscripten est de passer par <a target="_blank"
+							href="https://hub.docker.com/r/emscripten/emsdk">l'image docker officielle</a> qui
+						permet de s'affranchir de la configuration du système hôte et d'éviter l'étape d'installation.
+					</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<p>Voici la commande qui permettra de générer le module JavaScript capable d'excuter cotre code :
+					</p>
+					<pre>
+						<code data-line-numbers>docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="1-2">docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">Dans un premier temps, on lance un conteneur qui sera automatiquement détruit
+						après
+						utilisation.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="3">docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">On spécifie ensuite un volume de travail correspondant au dossier courant.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="4">docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">La commande est exécutée avec l'utilisateur courant, ainsi les fichiers
+						générés auront les droits d'exécution corrects.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="5">docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">Le nom de l'image officielle d'emscripten.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="6-8">docker run \
+--rm \
+-v $(pwd):/src \
+-u $(id -u):$(id -g) \
+emscripten/emsdk \
+emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">C'est cette commande qui permet de compiler notre code.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="1">emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p class="small-text">-Oz permet de spécifier au compilateur d'effectuer une optimisation sur la
+						taille du fichier produit (il existe <a target="_blank"
+							href="https://emscripten.org/docs/compiling/Building-Projects.html#building-projects-with-optimizations">plusieurs
+							type d'optimisations</a>).<br>
+						L'option <a target="_blank"
+							href="https://emscripten.org/docs/getting_started/FAQ.html#how-can-i-tell-when-the-page-is-fully-loaded-and-it-is-safe-to-call-compiled-functions">MODULARIZE</a>
+						permet d'encapsuler le code JavaScript dans une fonction de type factory, qui s'assure que le
+						code est bien chargé avant d'essayer de l'instancier.</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="2">emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p>Un nom d'export pour le module est défini</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers="3">emcc -I. -o newtonraphson.js -Oz -s MODULARIZE=1 \
+-s EXPORT_NAME=createModule --bind \
+problem.cpp newtonraphson.cpp bindings.cpp
+						</code>
+					</pre>
+					<p>Enfin, les fichiers c++ sont spécifiés (ils doivent se trouver dans le répertoire courant).</p>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<p>Deux fichiers sont générés par emscripten :</p>
+					<ul>
+						<li class="fragment fade-in">Un fichier wasm qui contient les instruction de notre code c++</li>
+						<li class="fragment fade-in">Un fichier js qui contient un code "glue" permettant d'instancier
+							facilement le module wasm</li>
+					</ul>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<p>On peut très simplement importer notre module JavaScript dans une page web classique :</p>
+					<pre>
+						<code>
+							<script type="text/template">
+<head>
+	<script type="text/javascript" src="newtonraphson.js"/>
+</head>
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section data-auto-animate data-transition="fade">
+					<h4 class="subtitle">2.2 Compiler en wasm</h4>
+					<pre>
+						<code data-line-numbers>createModule().then(({NewtonRaphson}) => {
+	// Valeur d'entrée
+	const initial_guess = -4;
+	const tolerance = 0.001;
+	// On effectue le calcul
+	const newtonraphson = new NewtonRaphson(tolerance);
+	const root = newtonraphson.solve(initial_guess);
+});
+						</code>
+					</pre>
+					<p>Et enfin instancier notre classe dans un script. La valeur de root correspond bien à la valeur
+						calculée par notre script.</p>
+				</section>
+				<section>
+					<p>La liste complète des fichiers nécessaires à la réalisation de ce test ainsi que des instructions
+						sont disponibles <a target="_blank"
+							href="https://github.com/ibethus/wasm-newtonraphson.git">ici</a>.</p>
+				</section>
 			</section>
 			</section>
 			<section>
 				<!-- *************** DEMOS ***************** -->
 				<section>
-					<h2>3. Démos</h2>
+					<h2>3. Démo</h2>
+				</section>
+				<section>
+					<p>
+						Certains projets sont relativement avancés en WebAssembly, notamment <a target="_blank"
+							href="https://github.com/kripken/ammo.js">Ammo</a>, qui est un portage du moteur physique
+						Bullet écrit en C++.
+						Cette librairie permet de réaliser des projet en 3D avec une physique réaliste et optimisés pour
+						le web.
+						Sur la diapo suivante, un exemple de ce dont est capable Ammo.
+					</p>
 				</section>
 				<section style="width: 100%; height: 100%;">
 					<iframe id="3DSimCar" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
 						allow="autoplay"
 						data-src="https://rawcdn.githack.com/kripken/ammo.js/99d0ec0b1e26d7ccc13e013caba8e8a5c98d953b/examples/webgl_demo_vehicle/index.html"
-						style="width: 100%; height: 100%; max-height: 100%; max-width: 100%;"
+						style="width: 100%; height: 100%; max-height: 90%; max-width: 100%;"
 						src="https://rawcdn.githack.com/kripken/ammo.js/99d0ec0b1e26d7ccc13e013caba8e8a5c98d953b/examples/webgl_demo_vehicle/index.html"></iframe>
+					<button onclick="getControl()">Prendre le contrôle</button>
 				</section>
+				<section>
+					<p>Il existe également des outils en ligne permettant de réaliser des tests sur de petits programmes,
+						compilant à la volée le code C/C++ en wasm, notamment <a target="_blank"
+							href="https://mbebenita.github.io/WasmExplorer/">WasmExplorer</a></p>
+				</section>
+
 			</section>
 			<section>
 				<!-- *************** PLUS LOIN ***************** -->
@@ -210,8 +546,10 @@
 			// Learn about plugins: https://revealjs.com/plugins/
 			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
 		});
-		// var iframe = document.getElementById("3DSimCar");
-		//iframe.contentWindow.focus();
+		function getControl() {
+			var iframe = document.getElementById("3DSimCar");
+			iframe.contentWindow.focus();
+		}
 	</script>
 </body>
 
