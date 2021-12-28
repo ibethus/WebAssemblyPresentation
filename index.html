@@ -24,7 +24,7 @@
 				<h1>WebAssembly</h1>
 			</section>
 			<!-- *************** PRINCIPE ***************** -->
-			<section data-transition="fade">
+			<section>
 				<h3>1. Principe</h3>
 				<section>
 					<p>Le WebAssembly (wasm) est un bytecode executé dans une machine virtuelle, interpretable par des
@@ -154,9 +154,9 @@
 						le code. </p>
 				</section>
 			</section>
-			<!-- *************** FONCTIONNEMENT ***************** -->
+			<!-- *************** EXEMPLE ***************** -->
 			<section>
-				<h2>2. Fonctionnement</h2>
+				<h2>2. Exemple</h2>
 				<section data-auto-animate data-transition="fade">
 					<p>
 						Le WebAssembly étant un langage machine, il faut écrire son programme dans un langage de base
@@ -290,7 +290,7 @@ EMSCRIPTEN_BINDINGS(newtonraphson) {
 				</section>
 				<section data-auto-animate data-transition="fade">
 					<h4 class="subtitle">2.2 Compiler en wasm</h4>
-					<p>Il s'agit de l'étape la plus importante et la délicate à réaliser : </p>
+					<p>Il s'agit de l'étape la plus importante et la plus délicate à réaliser : </p>
 					<ul>
 						<li class="fragment fade-in">Pour du C/C++ l'outil utilisé est <a target="_blank"
 								href="https://emscripten.org/">emscripten</a></li>
@@ -511,22 +511,26 @@ problem.cpp newtonraphson.cpp bindings.cpp
 				</section>
 
 			</section>
-			<section>
-				<!-- *************** PLUS LOIN ***************** -->
-				<section>
-					<h2>4. Aller plus loin</h2>
-				</section>
-				<section>
-					<h2>hello world</h2>
-				</section>
-			</section>
-			<section>
 				<!-- *************** SOURCES ***************** -->
 				<section>
-					<h2>5. Sources</h2>
-				</section>
-				<section>
-					<h2>hello world</h2>
+					<h2>4. Sources</h2>
+					<section data-transition="fade">
+						<p>Le site du Netherlands eScience Center, dont est extrait notre exemple, 
+							propose des axes d'amélioration pour notre petit programme en wasm sous forme de tutoriel,
+							indispensable pour en apprendre plus (à la fin de l'article).
+						</p>
+						<a target="_blank" href="https://blog.esciencecenter.nl/using-c-in-a-web-app-with-webassembly-efd78c08469">Voir le lien</a>
+					</section>
+					<section data-transition="fade">
+						<p>JavaScript January fournit l'article le plus complet et compréhensible sur 
+							le WebAssembly et son fonctionnement.
+						</p>
+						<a target="_blank" href="https://www.javascriptjanuary.com/blog/webassembly-neither-web-nor-assembly-but-revolutionary">Voir le lien.</a>
+					</section>
+					<section>
+						<p>Ce dépôt GitHub recense de nombreux projets passionnants, écrits en WebAssembly.</p>
+						<a target="_blank" href="https://github.com/mbasso/awesome-wasm">Voir le lien.</a>
+					</section>
 				</section>
 			</section>
 		</div>
